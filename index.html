@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Linked Open Data is Linked!</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="../common/delimited-favicon-v4.ico">
+    <script src="deps/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="deps/d3.v3.min.js" charset="utf-8"></script>
+    <!-- <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>-->
+
+    <script src="readjson.js"></script>
+    <script src="main.js"></script>
+<!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"> -->
+    <style>
+      #tooltip {
+        color: white;
+        opacity: .9;
+        background: #333;
+        padding: 5px;
+        border: 1px solid lightgrey;
+        border-radius: 5px;
+        position: absolute;
+        z-index: 10;
+        visibility: hidden;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+      #circle circle {
+        fill: none;
+        pointer-events: all;
+      }
+      path.group {
+        fill-opacity: .8;
+      }
+      path.chord {
+        fill-opacity: .8;
+        stroke: #000;
+        stroke-width: .25px;
+      }
+      #circle:hover path.fade {
+        display: none;
+      }
+
+#svgcontainer {
+	margin-top: 2em;
+	width: 1400px;
+	height: 1200px;
+	position:relative;
+}
+
+#order {
+	width:14em;
+	position:absolute;
+	top:0;
+	left:0;
+	z-index:10;
+}
+
+#filters {
+	width:19em;
+	position:absolute;
+	top: 0;
+	left: 1100px;
+	z-index: 10;
+}
+
+#filters p {
+	border: 1px solid black;
+	margin: 2px;
+	padding:0.3em;
+	padding-bottom:0.5em;
+	height:1.2em;
+	background: #EEE
+}
+
+#svgfloat {
+	position:absolute;
+	top: 0;
+	left: 0;
+	z-index:1;
+}
+
+  #menu .ui-selecting { background: #222222; color: white; }
+  #menu .ui-selected { background: #222222; color: white; }
+  #menu {  list-style-type: none; margin: 0; padding: 0;  }
+  #menu li { border:1px solid black; background:#EEEEEE; margin: 2px; padding: 0.3em; height: 1.2em; }
+
+    </style>
+  </head>
+  <body>
+<div>
+	<h1>Linked Open Data is Linked!</h1>
+<p>The following diagram represents the famous <a href="http://lod-cloud.net">Linked Open Data Cloud</a> as an interactive <a href="https://github.com/mbostock/d3/wiki/Chord-Layout">chord diagram</a> depicting the relationships among datasets using <a href="http://d3js.org">D3.js</a>. The data is extracted from the <a href="http://datahub.io">datahub.io</a> dataset repository, <a href="https://github.com/lod-cloud/datahub2void">converted to RDF</a>, and processed using the <a href="http://www.rdfhdt.org">RDF/HDT</a> tools. Special thanks to <a href="http://richard.cyganiak.de/">Richard Cyganiak</a> and <a href="http://anjeve.de/">Anja Jentzsch</a> for creating the original LOD Cloud diagram, and specially Richard for his feedback.</p>
+
+Distributed under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA license</a> and available on <br/><a href="http://github.com/MarioAriasGa/lod-chord">GitHub</a>.
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+<p>Visualization by <a href="http://github.com/MarioAriasGa">Mario Arias</a>.
+<p>Legend:<br/>
+The <b>height</b> of the outer ring represents the <b>size</b> (in number of statements) of each dataset, in logarithmic scale.<br/>
+The <b>sector width</b> is proportional to the number of <b>cross-dataset statements</b> (both incoming and outcoming).<br/>
+The <b>color</b> of each label represents the <b>category</b> (Government, Geography, etc.)</p>
+<a href="#" onclick="DoFullScreen(); return false">Enjoy Full screen</a>
+<a href="#" onclick="return saveSvg(this);">Save as SVG.</a>
+<!-- <a href="#" onclick="return savePng(this);">Save as PNG.</a> -->
+    </div>
+<div>
+
+<div id="svgcontainer">
+<a name="top"></a>
+
+<div id="filters">
+<b>Filter by</b>
+<p>
+<input id="sizefilterlabel" type="text" readonly size="7" value=">0"/>
+<input id="sizefilter" type="range" value="0"></input>
+<label for="sizefilter">Dataset size</label>
+</p>
+<p>
+<input id="linkfilterlabel" type="text" readonly size="7" value=">0" />
+<input id="linkfilter" type="range" value="0"></input>
+<label for="linkfilter">Links</label>
+</p>
+</div>
+
+<div id="order">
+<b>Order by</b>
+<ol id="menu">
+  <li id="1" class="ui-selected ui-widget-content">Name</li>
+  <li id="2" class="ui-widget-content">Dataset size</li>
+  <li id="3" class="ui-widget-content">Category</li>
+  <li id="4" class="ui-widget-content">Number of links</li>
+  <li id="5" class="ui-widget-content">Number of related datasets</li>
+</ol>
+</div>
+
+
+<div id="svgfloat">
+</div>
+
+<div style="clear:both">
+</div>
+</div>
+
+<div id="tooltip"></div>
+
+<div id="canvascontainer" style="display:none">
+</div>
+  </body>
+</html>
