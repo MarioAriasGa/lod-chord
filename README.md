@@ -1,6 +1,6 @@
 # D3 Chord Visualization of the Linked Open Data Cloud
 
-[See the interactive visualization here](http://marioariasga.github.io/lod-cloud)
+[See the interactive visualization here](https://marioariasga.github.io/lod-chord/)
 
 ![](/screenshots/screenshot.png)
 
